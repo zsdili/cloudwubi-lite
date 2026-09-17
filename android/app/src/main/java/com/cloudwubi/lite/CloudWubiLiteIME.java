@@ -295,7 +295,33 @@ public class CloudWubiLiteIME extends InputMethodService {
             LinearLayout rl = new LinearLayout(this);
             rl.setOrientation(LinearLayout.HORIZONTAL);
             rl.setGravity(Gravity.CENTER);
-            for (String k : row) rl.addView(makeKey(k, rowH, 10));
+            // V12 Z 行 = ↑ + z x c v b n m + ⌫（左 Shift、右退格删除）
+            if (row[0].equals("z")) {
+                rl.addView(makeFuncKey("↑", "shift", dp(40), rowH, 0));
+            }
+            for (String k : row) {
+                View mk = makeKey(k, rowH, 0);
+                rl.addView(mk, new LinearLayout.LayoutParams(0, rowH, 1));
+            }
+            if (row[0].equals("z")) {
+                TextView del = new TextView(this);
+                del.setText("×");
+                del.setTextColor(COL_MAIN);
+                del.setTextSize(FS_PANEL);
+                del.setGravity(Gravity.CENTER);
+                del.setBackground(roundBg(COL_FUNC));
+                del.setOnClickListener(v -> {
+                    if (composing.length() > 0) {
+                        composing.setLength(composing.length() - 1);
+                        queryCandidates();
+                    } else {
+                        InputConnection ic = getCurrentInputConnection();
+                        if (ic != null) ic.deleteSurroundingText(1, 0);
+                    }
+                    refreshStatus();
+                });
+                rl.addView(del, new LinearLayout.LayoutParams(dp(40), rowH));
+            }
             keyArea.addView(rl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, rowH));
         }
         // 底行：中文=V12 7 键（123|中|！，|空格|？。|符|⏎）；英文=shift|123|EN|空格|⏎
@@ -317,7 +343,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             bl.addView(sp1, slp1);
             bl.addView(makeFuncKey("？。", "sym2", dp(44), dp(74), 0));
             bl.addView(makeFuncKey("符", "sym", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("⏎", "enter", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(44), dp(74), 0));
         } else {
             bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(48), dp(74), 0));
             bl.addView(makeFuncKey("123", "num", dp(48), dp(74), 0));
@@ -331,7 +357,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(74), 1);
             slp2.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp2, slp2);
-            bl.addView(makeFuncKey("⏎", "enter", dp(48), dp(74), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(48), dp(74), 0));
         }
         keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(80)));
     }
@@ -344,6 +370,16 @@ public class CloudWubiLiteIME extends InputMethodService {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, h, 1);
         lp.setMargins(dp(D_GAP), dp(D_GAP) / 2, dp(D_GAP), dp(D_GAP) / 2);
         k.setLayoutParams(lp);
+        // 上档常显（新图：数字/符号在字母上方）
+        String shifted = shiftedOf(letter);
+        if (shifted != null) {
+            TextView up = new TextView(this);
+            up.setText(shifted);
+            up.setTextColor(COL_SUB);
+            up.setTextSize(FS_ROOT);
+            up.setGravity(Gravity.CENTER);
+            k.addView(up);
+        }
         // 主字母
         TextView main = new TextView(this);
         main.setText(shiftState && !chineseMode ? letter.toUpperCase() : letter);
@@ -462,11 +498,8 @@ public class CloudWubiLiteIME extends InputMethodService {
             case "=":
                 String res = CalcEngine.calc(calcBuf.toString());
                 if (res != null) {
-                    candidates.clear();
-                    candidates.add(calcBuf + "=" + res);
-                    candidates.add(res);
-                    updateCandBar();
-                    pendingCalcResult = true;
+                    commit(res);
+                    calcBuf.setLength(0);
                 }
                 break;
             case "÷": calcBuf.append("/"); break;
@@ -623,6 +656,10 @@ public class CloudWubiLiteIME extends InputMethodService {
     // ---------- 输入处理 ----------
     private void onLetterKey(String letter) {
         if (!chineseMode) { commitAscii(shiftState ? letter.toUpperCase() : letter); return; }
+        if (shiftState) {
+            String sh = shiftedOf(letter);
+            if (sh != null) { commitAscii(sh); shiftState = false; rebuildPanel(0); return; }
+        }
         if (composing.length() >= 4) { composing.setLength(0); candidates.clear(); }
         composing.append(letter);
         queryCandidates();
