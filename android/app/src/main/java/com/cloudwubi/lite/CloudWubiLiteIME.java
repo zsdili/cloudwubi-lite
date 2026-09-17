@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 云五笔 Lite（v0.6.0）
+ * 云五笔 Lite（v0.6.1）
  * 设计基准：V12 设计稿（键面白 #FFF / 功能灰 #E8EAED / 选中蓝 #DCE1E7；
  *           文字主 #3A3F47 / 次 #9AA0A8；圆角 8 / 间隙 3 / 边距 12；总高 300）
  * 功能极简：王码86 单字（1/2/3/4 码 + 万能键 z）+ 云端词组（SCF）+ 词频/MRU 可调
@@ -486,10 +486,12 @@ public class CloudWubiLiteIME extends InputMethodService {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setGravity(Gravity.CENTER);
         String[] lines = {
-            "云五笔 v0.6.0",
+            "云五笔 v0.6.1",
             "GitHub 反馈：github.com/zsdili",
             "微信反馈：添加好友后留言",
-            latestVersion != null && !latestVersion.equals("v0.6.0") ? "新版本：" + latestVersion : "已是最新版本"
+            "空格=选首词 | 点选=上屏 | 上滑=数字",
+            "剪贴板长按=删除 | 编码不足自动查词",
+            latestVersion != null && !latestVersion.equals("v0.6.1") ? "新版本：" + latestVersion : "已是最新版本"
         };
         for (String s : lines) {
             TextView tv = new TextView(this);
@@ -604,11 +606,11 @@ public class CloudWubiLiteIME extends InputMethodService {
         } else if (panelMode == 4) {
             txt = "云五笔";
         } else {
-            txt = composing.length() > 0 ? composing.toString() : "云五笔";
+            txt = composing.length() > 0 ? "编码:" + composing.toString() : "云五笔";
         }
         statusInfo.setText(txt);
         if (redDot != null) {
-            boolean hasNew = latestVersion != null && !latestVersion.equals("v0.6.0");
+            boolean hasNew = latestVersion != null && !latestVersion.equals("v0.6.1");
             redDot.setVisibility(hasNew ? View.VISIBLE : View.GONE);
         }
     }
