@@ -65,6 +65,11 @@ public class CloudWubiLiteIME extends InputMethodService {
         {"h","目 止 卜 丨"},{"j","日 曰 早 虫"},{"k","口 川"},{"l","田 甲 车 力"},
         {"z","万能键"},{"x","纟 幺 弓 匕"},{"c","又 巴 马"},{"v","女 刀 九 臼"},{"b","子 耳 阝 也"},{"n","已 尸 心 羽"},{"m","山 贝 冂 几"}
     };
+    // 上档字符（V12）：Q-P 数字见 digitOf；A-L 行 ~@#$%&*()；Z-M 行 ,/-_:;、
+    private static final String[][] SHIFTED = {
+        {"a","~"},{"s","@"},{"d","#"},{"f","$"},{"g","%"},{"h","&"},{"j","*"},{"k","("},{"l",")"},
+        {"z",","},{"x","/"},{"c","-"},{"v","_"},{"b",":"},{"n",";"},{"m","、"}
+    };
     private static final char[][] DIGIT_SWIPE = {
         {'1','2','3','4','5','6','7','8','9','0'},
         {'@','#','$','%','&','*','(',')'},
@@ -194,6 +199,8 @@ public class CloudWubiLiteIME extends InputMethodService {
             case "取消": undo(); break;
             case "重做": redo(); break;
             case "语音": startVoice(); break;
+            case "sym1": if (chineseMode) commit("！"); else commitAscii("！"); break;
+            case "sym2": if (chineseMode) commit("？"); else commitAscii("？"); break;
             case "剪贴板": showPanel(3); break;
             case "收起": requestHideSelf(0); break;
         }
@@ -214,9 +221,11 @@ public class CloudWubiLiteIME extends InputMethodService {
     private void updateCandBar() {
         candBar.removeAllViews();
         if (candidates.isEmpty()) return;
+        int idx = 0;
         for (final String c : candidates) {
+            idx++;
             TextView tv = new TextView(this);
-            tv.setText(c);
+            tv.setText(idx + ". " + c);
             tv.setTextColor(COL_MAIN);
             tv.setTextSize(FS_CAND);
             tv.setGravity(Gravity.CENTER);
@@ -256,23 +265,41 @@ public class CloudWubiLiteIME extends InputMethodService {
             for (String k : row) rl.addView(makeKey(k, rowH, 10));
             keyArea.addView(rl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, rowH));
         }
-        // 底行：shift | 123 | 中英 | 空格 | 回车
+        // 底行：中文=V12 7 键（123|中|！，|空格|？。|符|⏎）；英文=shift|123|EN|空格|⏎
         LinearLayout bl = new LinearLayout(this);
         bl.setOrientation(LinearLayout.HORIZONTAL);
         bl.setGravity(Gravity.CENTER);
-        bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(48), dp(74), 0));
-        bl.addView(makeFuncKey("123", "num", dp(48), dp(74), 0));
-        bl.addView(makeFuncKey(chineseMode ? "中" : "EN", "lang", dp(48), dp(74), 0));
-        TextView sp = new TextView(this);
-        sp.setText("空格");
-        sp.setTextColor(COL_SUB); sp.setTextSize(FS_PANEL);
-        sp.setGravity(Gravity.CENTER);
-        sp.setBackground(roundBg(COL_KEYS));
-        sp.setOnClickListener(v -> onSpace());
-        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(0, dp(74), 1);
-        slp.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
-        bl.addView(sp, slp);
-        bl.addView(makeFuncKey("⏎", "enter", dp(48), dp(74), 0));
+        if (chineseMode) {
+            bl.addView(makeFuncKey("123", "num", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("中", "lang", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("！，", "sym1", dp(44), dp(74), 0));
+            TextView sp1 = new TextView(this);
+            sp1.setText("空格");
+            sp1.setTextColor(COL_SUB); sp1.setTextSize(FS_PANEL);
+            sp1.setGravity(Gravity.CENTER);
+            sp1.setBackground(roundBg(COL_KEYS));
+            sp1.setOnClickListener(v -> onSpace());
+            LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(74), 1);
+            slp1.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
+            bl.addView(sp1, slp1);
+            bl.addView(makeFuncKey("？。", "sym2", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("符", "sym", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("⏎", "enter", dp(44), dp(74), 0));
+        } else {
+            bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(48), dp(74), 0));
+            bl.addView(makeFuncKey("123", "num", dp(48), dp(74), 0));
+            bl.addView(makeFuncKey("EN", "lang", dp(48), dp(74), 0));
+            TextView sp2 = new TextView(this);
+            sp2.setText("空格");
+            sp2.setTextColor(COL_SUB); sp2.setTextSize(FS_PANEL);
+            sp2.setGravity(Gravity.CENTER);
+            sp2.setBackground(roundBg(COL_KEYS));
+            sp2.setOnClickListener(v -> onSpace());
+            LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(74), 1);
+            slp2.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
+            bl.addView(sp2, slp2);
+            bl.addView(makeFuncKey("⏎", "enter", dp(48), dp(74), 0));
+        }
         keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(80)));
     }
 
@@ -284,6 +311,16 @@ public class CloudWubiLiteIME extends InputMethodService {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, h, 1);
         lp.setMargins(dp(D_GAP), dp(D_GAP) / 2, dp(D_GAP), dp(D_GAP) / 2);
         k.setLayoutParams(lp);
+        // 上档字符（V12：顶部小字——Q-P 数字 / A-L、Z-M 符号）
+        String shifted = shiftedOf(letter);
+        if (shifted != null) {
+            TextView up = new TextView(this);
+            up.setText(shifted);
+            up.setTextColor(COL_SUB);
+            up.setTextSize(FS_ROOT);
+            up.setGravity(Gravity.CENTER);
+            k.addView(up);
+        }
         // 主字母
         TextView main = new TextView(this);
         main.setText(shiftState && !chineseMode ? letter.toUpperCase() : letter);
@@ -300,16 +337,6 @@ public class CloudWubiLiteIME extends InputMethodService {
             sub.setTextSize(FS_ROOT);
             sub.setGravity(Gravity.CENTER);
             k.addView(sub);
-        }
-        // 数字子标签（Q-P 行）
-        int digit = digitOf(letter);
-        if (digit >= 0) {
-            TextView dgt = new TextView(this);
-            dgt.setText(String.valueOf(digit));
-            dgt.setTextColor(COL_SUB);
-            dgt.setTextSize(FS_ROOT);
-            dgt.setGravity(Gravity.TOP | Gravity.LEFT);
-            k.addView(dgt, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(12)));
         }
         // 点击输入
         k.setOnClickListener(v -> onLetterKey(letter));
@@ -462,11 +489,16 @@ public class CloudWubiLiteIME extends InputMethodService {
     // ---------- 剪贴板面板 ----------
     private void buildClipKey() {
         List<String> clips = ClipStore.list();
+        TextView tip = new TextView(this);
+        tip.setText("◀返回（长按可删除）");
+        tip.setTextColor(COL_SUB); tip.setTextSize(FS_PANEL);
+        tip.setPadding(dp(4), dp(4), dp(4), dp(4));
+        keyArea.addView(tip, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         if (clips.isEmpty()) {
             TextView empty = new TextView(this);
             empty.setText("剪贴板为空");
             empty.setTextColor(COL_SUB); empty.setGravity(Gravity.CENTER);
-            keyArea.addView(empty, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            keyArea.addView(empty, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
         } else {
             ScrollView sv = new ScrollView(this);
             LinearLayout list = new LinearLayout(this);
@@ -562,10 +594,9 @@ public class CloudWubiLiteIME extends InputMethodService {
     }
 
     private void onSwipeUp(String letter) {
-        int digit = digitOf(letter);
-        if (digit >= 0) {
-            if (chineseMode) commit(String.valueOf(digit)); else commitAscii(String.valueOf(digit));
-        }
+        String sh = shiftedOf(letter);
+        if (sh == null) return;
+        if (chineseMode) commit(sh); else commitAscii(sh);
     }
 
     private void onSpace() {
@@ -753,5 +784,11 @@ public class CloudWubiLiteIME extends InputMethodService {
         String row = "qwertyuiop";
         int i = row.indexOf(letter);
         return i >= 0 ? i + 1 : -1;
+    }
+    private String shiftedOf(String letter) {
+        int d = digitOf(letter);
+        if (d >= 0) return String.valueOf(d);
+        for (String[] sp : SHIFTED) if (sp[0].equals(letter)) return sp[1];
+        return null;
     }
 }
