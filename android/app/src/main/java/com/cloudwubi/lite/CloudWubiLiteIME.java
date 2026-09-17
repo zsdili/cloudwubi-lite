@@ -2,12 +2,17 @@ package com.cloudwubi.lite;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -156,7 +161,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         toolbar.addView(brandBox, new LinearLayout.LayoutParams(0, dp(D_TOOLBAR), 1));
 
         // 右侧工具（固定宽度、统一圆圈细线图标）
-        String[][] tools = {{"✓","全选"},{"↺","取消"},{"↻","重做"},{"▤","剪贴板"},{"▾","收起"}};
+        String[][] tools = {{"✓","全选"},{"↺","取消"},{"↻","重做"},{"🎤","语音"},{"▤","剪贴板"},{"▾","收起"}};
         for (String[] t : tools) toolbar.addView(makeToolIcon(t[0], t[1]));
         root.addView(toolbar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(D_TOOLBAR)));
     }
@@ -181,6 +186,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             case "全选": InputConnection ic = getCurrentInputConnection(); if (ic != null) ic.performContextMenuAction(android.R.id.selectAll); break;
             case "取消": undo(); break;
             case "重做": redo(); break;
+            case "语音": startVoice(); break;
             case "剪贴板": showPanel(3); break;
             case "收起": requestHideSelf(0); break;
         }
@@ -615,6 +621,76 @@ public class CloudWubiLiteIME extends InputMethodService {
             boolean hasNew = latestVersion != null && !latestVersion.equals("v0.6.1");
             redDot.setVisibility(hasNew ? View.VISIBLE : View.GONE);
         }
+    }
+
+    // ---------- 语音输入（系统 SpeechRecognizer，免费） ----------
+    private SpeechRecognizer sr;
+    private boolean listening = false;
+
+    private void startVoice() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            statusInfo.setText("系统无语音识别服务");
+            return;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 23 &&
+            checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            statusInfo.setText("请开启麦克风权限");
+            try {
+                startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            } catch (Exception ignored) { }
+            return;
+        }
+        if (listening) { if (sr != null) { sr.stopListening(); listening = false; } return; }
+        if (sr != null) { sr.destroy(); sr = null; }
+        sr = SpeechRecognizer.createSpeechRecognizer(this);
+        sr.setRecognitionListener(new RecognitionListener() {
+            @Override public void onReadyForSpeech(Bundle p) { listening = true; statusInfo.setText("聆听中…"); }
+            @Override public void onBeginningOfSpeech() { }
+            @Override public void onRmsChanged(float v) { }
+            @Override public void onBufferReceived(byte[] b) { }
+            @Override public void onEndOfSpeech() { statusInfo.setText("识别中…"); }
+            @Override public void onError(int e) {
+                listening = false;
+                statusInfo.setText(voiceError(e));
+                if (sr != null) { sr.destroy(); sr = null; }
+            }
+            @Override public void onResults(Bundle r) {
+                listening = false;
+                ArrayList<String> ms = r.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (ms != null && !ms.isEmpty()) commit(ms.get(0));
+                else statusInfo.setText("未听清，再试一次");
+                if (sr != null) { sr.destroy(); sr = null; }
+                statusInfo.setText("云五笔");
+            }
+            @Override public void onPartialResults(Bundle p) { }
+            @Override public void onEvent(int t, Bundle b) { }
+        });
+        try {
+            Intent it = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            it.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-CN");
+            it.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+            sr.startListening(it);
+        } catch (Exception ex) {
+            statusInfo.setText("语音启动失败");
+            if (sr != null) { sr.destroy(); sr = null; }
+        }
+    }
+
+    private String voiceError(int e) {
+        switch (e) {
+            case SpeechRecognizer.ERROR_NO_MATCH: return "未听清，再试一次";
+            case SpeechRecognizer.ERROR_NETWORK: return "网络不可用";
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT: return "网络超时，再试一次";
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT: return "没听到声音";
+            default: return "语音失败，再试一次";
+        }
+    }
+
+    @Override public void onDestroy() {
+        if (sr != null) { sr.destroy(); sr = null; }
+        super.onDestroy();
     }
 
     // ---------- 版本检测 ----------
