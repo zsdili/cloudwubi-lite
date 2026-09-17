@@ -363,40 +363,32 @@ public class CloudWubiLiteIME extends InputMethodService {
     }
 
     private View makeKey(final String letter, int h, int cols) {
-        LinearLayout k = new LinearLayout(this);
-        k.setOrientation(LinearLayout.VERTICAL);
-        k.setGravity(Gravity.CENTER);
+        android.widget.FrameLayout k = new android.widget.FrameLayout(this);
         k.setBackground(roundBg(COL_KEYS));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, h, 1);
         lp.setMargins(dp(D_GAP), dp(D_GAP) / 2, dp(D_GAP), dp(D_GAP) / 2);
         k.setLayoutParams(lp);
-        // 上档常显（新图：数字/符号在字母上方）
+        // 上档常显：顶部小字（数字/符号）
         String shifted = shiftedOf(letter);
         if (shifted != null) {
             TextView up = new TextView(this);
             up.setText(shifted);
             up.setTextColor(COL_SUB);
             up.setTextSize(FS_ROOT);
-            up.setGravity(Gravity.CENTER);
-            k.addView(up);
+            up.setGravity(Gravity.CENTER_HORIZONTAL);
+            android.widget.FrameLayout.LayoutParams ulp = new android.widget.FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            ulp.gravity = Gravity.TOP;
+            k.addView(up, ulp);
         }
-        // 主字母
+        // 主字母：大写居中（国际标准，键面无中文）
         TextView main = new TextView(this);
-        main.setText(shiftState && !chineseMode ? letter.toUpperCase() : letter);
+        main.setText(letter.toUpperCase());
         main.setTextColor(COL_MAIN);
         main.setTextSize(FS_KEY);
         main.setGravity(Gravity.CENTER);
-        k.addView(main);
-        // 字根标注（次文字）
-        String root = rootLabel(letter);
-        if (!root.isEmpty()) {
-            TextView sub = new TextView(this);
-            sub.setText(root);
-            sub.setTextColor(COL_SUB);
-            sub.setTextSize(FS_ROOT);
-            sub.setGravity(Gravity.CENTER);
-            k.addView(sub);
-        }
+        k.addView(main, new android.widget.FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         // 点击输入
         k.setOnClickListener(v -> onLetterKey(letter));
         // 上滑出数字/符号
@@ -864,6 +856,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
         g.setColor(color);
         g.setCornerRadius(dp(D_RADIUS));
+        g.setStroke(dp(1), 0xFFD8D8D8);
         return g;
     }
     private int dp(int v) { return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics())); }
