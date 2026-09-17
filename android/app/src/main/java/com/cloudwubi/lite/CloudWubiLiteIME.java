@@ -49,10 +49,10 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int COL_SUB  = Color.rgb(0x8A, 0x90, 0x99); // 次文字
     private static final int COL_LINK = 0xFF3366CC;                 // 链接（GitHub 反馈）
     private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 200;
-    private static final int D_MARGIN = 12, D_GAP = 3, D_RADIUS = 6;
+    private static final int D_MARGIN = 14, D_GAP = 4, D_RADIUS = 6;
     // ---------- V12 字号令牌（统一规范） ----------
     private static final int FS_KEY = 20;    // 键盘字母/数字
-    private static final int FS_ROOT = 9;    // 字根标注/数字子标
+    private static final int FS_ROOT = 10;   // 上档数字/符号
     private static final int FS_FUNC = 15;   // 功能键（shift/123/中英/回车）
     private static final int FS_CAND = 16;   // 备选栏（用户指定 16pt）
     private static final int FS_PANEL = 14;  // 其他界面（符号/剪贴板/信息/工具栏/状态栏——用户指定 14f）
@@ -136,7 +136,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     @Override public View onCreateInputView() {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFF0F1F3);
+        root.setBackgroundColor(0xFFE8EAED);
         root.setPadding(dp(D_MARGIN), 0, dp(D_MARGIN), 0);
         buildTabBar();
         buildToolbar();
@@ -392,7 +392,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             android.widget.FrameLayout.LayoutParams ulp = new android.widget.FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             ulp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            ulp.bottomMargin = h / 2 + dp(4);
+            ulp.bottomMargin = h / 2 + dp(3);
             k.addView(up, ulp);
         }
         // 主字母：大写居中（国际标准，键面无中文）
@@ -879,11 +879,10 @@ public class CloudWubiLiteIME extends InputMethodService {
     }
     // 键面质感：上下渐变 + 底部深色描边（模拟投影，国际标准）
     private android.graphics.drawable.Drawable keyBg(boolean func) {
-        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable(
-            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-            func ? new int[]{0xFFF0F1F3, 0xFFE3E5E8} : new int[]{0xFFFFFFFF, 0xFFF5F6F8});
+        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+        g.setColor(func ? 0xFFF0F1F3 : Color.WHITE);
         g.setCornerRadius(dp(D_RADIUS));
-        g.setStroke(dp(1), func ? 0xFFC9CDD3 : 0xFFD9DCE0);
+        g.setStroke(dp(1), func ? 0xFFC9CDD3 : 0xFFDDE1E6);
         return g;
     }
     private int dp(int v) { return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics())); }
@@ -897,7 +896,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     private int digitOf(String letter) {
         String row = "qwertyuiop";
         int i = row.indexOf(letter);
-        return i >= 0 ? i + 1 : -1;
+        return i >= 0 ? (i == 9 ? 0 : i + 1) : -1;
     }
     private String shiftedOf(String letter) {
         int d = digitOf(letter);
