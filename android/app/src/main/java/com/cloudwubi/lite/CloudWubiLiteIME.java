@@ -92,6 +92,8 @@ public class CloudWubiLiteIME extends InputMethodService {
 
     // ---------- 视图 ----------
     private LinearLayout root;
+    private LinearLayout tabBar;                 // V12 顶部标签栏
+    private TextView[] tabs = new TextView[5];   // 中文/数字/符号/表情/剪贴板
     private LinearLayout toolbar;
     private TextView statusInfo;             // 左侧"云五笔"（编码/计算显示）
     private View redDot;                     // 版本红点
@@ -123,6 +125,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(COL_KEYS);
         root.setPadding(dp(D_MARGIN), 0, dp(D_MARGIN), 0);
+        buildTabBar();
         buildToolbar();
         View divider = new View(this);
         divider.setBackgroundColor(COL_FUNC);
@@ -141,6 +144,36 @@ public class CloudWubiLiteIME extends InputMethodService {
         candidates.clear();
         updateCandBar();
         refreshStatus();
+    }
+
+    // ---------- V12 顶部标签栏：中文 | 数字 | 符号 | 表情 | 剪贴板 ----------
+    private static final int[] TAB_MODES = {0, 1, 2, 5, 3};
+    private void buildTabBar() {
+        tabBar = new LinearLayout(this);
+        tabBar.setOrientation(LinearLayout.HORIZONTAL);
+        tabBar.setGravity(Gravity.CENTER);
+        tabBar.setBackgroundColor(COL_FUNC);
+        String[] names = {"中文", "数字", "符号", "表情", "剪贴板"};
+        for (int i = 0; i < 5; i++) {
+            final int m = TAB_MODES[i];
+            TextView t = new TextView(this);
+            t.setText(names[i]);
+            t.setTextSize(FS_PANEL);
+            t.setGravity(Gravity.CENTER);
+            t.setPadding(dp(8), 0, dp(8), 0);
+            t.setOnClickListener(v -> showPanel(m));
+            tabBar.addView(t, new LinearLayout.LayoutParams(0, dp(20), 1));
+            tabs[i] = t;
+        }
+        root.addView(tabBar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(20)));
+    }
+    private void updateTabHighlight() {
+        for (int i = 0; i < 5; i++) {
+            boolean sel = TAB_MODES[i] == panelMode;
+            tabs[i].setTextColor(sel ? COL_MAIN : COL_SUB);
+            tabs[i].setBackgroundColor(sel ? COL_KEYS : COL_FUNC);
+            tabs[i].setTypeface(null, sel ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
+        }
     }
 
     // ---------- 工具栏 ----------
@@ -221,11 +254,9 @@ public class CloudWubiLiteIME extends InputMethodService {
     private void updateCandBar() {
         candBar.removeAllViews();
         if (candidates.isEmpty()) return;
-        int idx = 0;
         for (final String c : candidates) {
-            idx++;
             TextView tv = new TextView(this);
-            tv.setText(idx + ". " + c);
+            tv.setText(c);
             tv.setTextColor(COL_MAIN);
             tv.setTextSize(FS_CAND);
             tv.setGravity(Gravity.CENTER);
@@ -244,8 +275,10 @@ public class CloudWubiLiteIME extends InputMethodService {
         if (mode == 0) buildChineseKey();
         else if (mode == 1) buildNumberKey();
         else if (mode == 2) buildSymbolKey();
+        else if (mode == 5) buildEmojiKey();
         else if (mode == 3) buildClipKey();
         else buildInfoPanel();
+        updateTabHighlight();
         refreshStatus();
     }
 
@@ -271,7 +304,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.setGravity(Gravity.CENTER);
         if (chineseMode) {
             bl.addView(makeFuncKey("123", "num", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("中", "lang", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("中/英", "lang", dp(44), dp(74), 0));
             bl.addView(makeFuncKey("！，", "sym1", dp(44), dp(74), 0));
             TextView sp1 = new TextView(this);
             sp1.setText("空格");
@@ -311,16 +344,6 @@ public class CloudWubiLiteIME extends InputMethodService {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, h, 1);
         lp.setMargins(dp(D_GAP), dp(D_GAP) / 2, dp(D_GAP), dp(D_GAP) / 2);
         k.setLayoutParams(lp);
-        // 上档字符（V12：顶部小字——Q-P 数字 / A-L、Z-M 符号）
-        String shifted = shiftedOf(letter);
-        if (shifted != null) {
-            TextView up = new TextView(this);
-            up.setText(shifted);
-            up.setTextColor(COL_SUB);
-            up.setTextSize(FS_ROOT);
-            up.setGravity(Gravity.CENTER);
-            k.addView(up);
-        }
         // 主字母
         TextView main = new TextView(this);
         main.setText(shiftState && !chineseMode ? letter.toUpperCase() : letter);
@@ -483,6 +506,36 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.setOrientation(LinearLayout.HORIZONTAL);
         bl.addView(makeFuncKey("返回", "back", 0, dp(40), 1));
         keyArea.addView(sv, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(40)));
+    }
+
+    // ---------- 表情面板（V12 标签：表情） ----------
+    private void buildEmojiKey() {
+        String[] emojis = {"😀","😁","😂","🤣","😊","😍","🥰","😘","😜","🤪","😎","🤩","🥳","😏","😒","😔","😢","😭","😤","😡","🤔","🤗","🤫","🤭","😴","🤤","😱","🤯","😇","🙃","👍","👎","👏","🙏","💪","🤝","✌️","🤞","👌","🤟","🖐️","❤️","💔","💯","🔥","✨","⭐","🎉","🎂","🌸","🍀","🌹","☀️","🌈","⚡","❄️","🎵","🎮","💰","🚀"};
+        ScrollView sv = new ScrollView(this);
+        sv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        GridLayout gl = new GridLayout(this);
+        gl.setColumnCount(6);
+        for (String e : emojis) {
+            TextView b = new TextView(this);
+            b.setText(e);
+            b.setTextSize(FS_PANEL);
+            b.setGravity(Gravity.CENTER);
+            b.setBackground(roundBg(COL_KEYS));
+            GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
+            lp.width = 0; lp.height = dp(40);
+            lp.setMargins(dp(1), dp(1), dp(1), dp(1));
+            lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f);
+            b.setLayoutParams(lp);
+            final String c = e;
+            b.setOnClickListener(v -> { if (chineseMode) commit(c); else commitAscii(c); });
+            gl.addView(b);
+        }
+        sv.addView(gl);
+        keyArea.addView(sv, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        LinearLayout bl = new LinearLayout(this);
+        bl.setOrientation(LinearLayout.HORIZONTAL);
+        bl.addView(makeFuncKey("返回", "back", 0, dp(40), 1));
         keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(40)));
     }
 
@@ -777,7 +830,10 @@ public class CloudWubiLiteIME extends InputMethodService {
     }
     private int dp(int v) { return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics())); }
     private String rootLabel(String letter) {
-        for (String[] r : ROOTS) if (r[0].equals(letter)) return r[1];
+        for (String[] r : ROOTS) if (r[0].equals(letter)) {
+            String[] parts = r[1].split(" ");
+            return parts.length > 0 ? parts[0] : "";
+        }
         return "";
     }
     private int digitOf(String letter) {
