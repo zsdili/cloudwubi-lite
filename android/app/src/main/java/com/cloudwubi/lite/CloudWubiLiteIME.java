@@ -45,11 +45,11 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int COL_KEYS = Color.WHITE;        // 键面白
     private static final int COL_FUNC = Color.rgb(0xE8, 0xEA, 0xED); // 功能灰
     private static final int COL_SEL  = Color.rgb(0xDC, 0xE1, 0xE7); // 选中蓝
-    private static final int COL_MAIN = Color.rgb(0x2B, 0x2F, 0x36); // 主文字（更深更清晰）
-    private static final int COL_SUB  = Color.rgb(0x8A, 0x90, 0x99); // 次文字
+    private static final int COL_MAIN = Color.rgb(0x20, 0x21, 0x24); // 主文字（Gboard近黑）
+    private static final int COL_SUB  = Color.rgb(0x5F, 0x63, 0x68); // 次文字（Gboard中灰）
     private static final int COL_LINK = 0xFF3366CC;                 // 链接（GitHub 反馈）
-    private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 200;
-    private static final int D_MARGIN = 14, D_GAP = 4, D_RADIUS = 6;
+    private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 212;
+    private static final int D_MARGIN = 14, D_GAP = 4, D_RADIUS = 7;
     // ---------- V12 字号令牌（统一规范） ----------
     private static final int FS_KEY = 20;    // 键盘字母/数字
     private static final int FS_ROOT = 10;   // 上档数字/符号
@@ -136,7 +136,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     @Override public View onCreateInputView() {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFE8EAED);
+        root.setBackgroundColor(0xFFF5F6F7);
         root.setPadding(dp(D_MARGIN), 0, dp(D_MARGIN), 0);
         buildTabBar();
         buildToolbar();
@@ -297,7 +297,7 @@ public class CloudWubiLiteIME extends InputMethodService {
 
     // ---------- 中文键盘 ----------
     private void buildChineseKey() {
-        // 3 行字母 + 1 行底行（200dp：3×46 + 底行 56）
+        // 3 行字母 + 1 行底行（212dp：3×50 + 底行 56）
         int rowH = (dp(D_KEYBOARD) - dp(56) - dp(2) * D_GAP) / 3;
         String[][] rows = {
             {"q","w","e","r","t","y","u","i","o","p"},
@@ -874,15 +874,13 @@ public class CloudWubiLiteIME extends InputMethodService {
         android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
         g.setColor(color);
         g.setCornerRadius(dp(D_RADIUS));
-        g.setStroke(dp(1), 0xFFD8D8D8);
         return g;
     }
-    // 键面质感：上下渐变 + 底部深色描边（模拟投影，国际标准）
+    // 键面质感：纯色无描边（Gboard 浅色标准，干净轻盈）
     private android.graphics.drawable.Drawable keyBg(boolean func) {
         android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
-        g.setColor(func ? 0xFFF0F1F3 : Color.WHITE);
+        g.setColor(func ? 0xFFE9EBEE : Color.WHITE);
         g.setCornerRadius(dp(D_RADIUS));
-        g.setStroke(dp(1), func ? 0xFFC9CDD3 : 0xFFDDE1E6);
         return g;
     }
     private int dp(int v) { return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics())); }
