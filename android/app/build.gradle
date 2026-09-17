@@ -3,9 +3,9 @@ android {
     compileSdkVersion 34
     defaultConfig {
         applicationId "com.cloudwubi.lite"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 33
-        versionCode 161
-        versionName "0.6.2"
+        versionCode 163
+        versionName "0.6.3"
     }
 }
