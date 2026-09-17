@@ -329,21 +329,21 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.setOrientation(LinearLayout.HORIZONTAL);
         bl.setGravity(Gravity.CENTER);
         if (chineseMode) {
-            bl.addView(makeFuncKey("123", "num", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("中/英", "lang", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("！，", "sym1", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("123", "num", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("中/英", "lang", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("！，", "sym1", dp(38), dp(74), 0));
             TextView sp1 = new TextView(this);
             sp1.setText("空格");
             sp1.setTextColor(COL_SUB); sp1.setTextSize(FS_PANEL);
             sp1.setGravity(Gravity.CENTER);
             sp1.setBackground(roundBg(COL_KEYS));
             sp1.setOnClickListener(v -> onSpace());
-            LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(74), 1);
+            LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(74), 2);
             slp1.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp1, slp1);
-            bl.addView(makeFuncKey("？。", "sym2", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("符", "sym", dp(44), dp(74), 0));
-            bl.addView(makeFuncKey("↵", "enter", dp(44), dp(74), 0));
+            bl.addView(makeFuncKey("🎤", "voice", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("？。", "sym2", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(38), dp(74), 0));
         } else {
             bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(48), dp(74), 0));
             bl.addView(makeFuncKey("123", "num", dp(48), dp(74), 0));
@@ -434,6 +434,7 @@ public class CloudWubiLiteIME extends InputMethodService {
 
     private void funcAction(String a) {
         switch (a) {
+            case "voice": startVoice(); break;
             case "shift": shiftState = !shiftState; rebuildPanel(0); break;
             case "num": showPanel(1); break;
             case "lang":
