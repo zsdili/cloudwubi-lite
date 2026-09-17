@@ -45,11 +45,11 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int COL_KEYS = Color.WHITE;        // 键面白
     private static final int COL_FUNC = Color.rgb(0xE8, 0xEA, 0xED); // 功能灰
     private static final int COL_SEL  = Color.rgb(0xDC, 0xE1, 0xE7); // 选中蓝
-    private static final int COL_MAIN = Color.rgb(0x3A, 0x3F, 0x47); // 主文字
-    private static final int COL_SUB  = Color.rgb(0x9A, 0xA0, 0xA8); // 次文字
+    private static final int COL_MAIN = Color.rgb(0x2B, 0x2F, 0x36); // 主文字（更深更清晰）
+    private static final int COL_SUB  = Color.rgb(0x8A, 0x90, 0x99); // 次文字
     private static final int COL_LINK = 0xFF3366CC;                 // 链接（GitHub 反馈）
     private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 200;
-    private static final int D_MARGIN = 12, D_GAP = 3, D_RADIUS = 8;
+    private static final int D_MARGIN = 12, D_GAP = 3, D_RADIUS = 6;
     // ---------- V12 字号令牌（统一规范） ----------
     private static final int FS_KEY = 20;    // 键盘字母/数字
     private static final int FS_ROOT = 9;    // 字根标注/数字子标
@@ -136,7 +136,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     @Override public View onCreateInputView() {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(COL_KEYS);
+        root.setBackgroundColor(0xFFF0F1F3);
         root.setPadding(dp(D_MARGIN), 0, dp(D_MARGIN), 0);
         buildTabBar();
         buildToolbar();
@@ -165,7 +165,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         tabBar = new LinearLayout(this);
         tabBar.setOrientation(LinearLayout.HORIZONTAL);
         tabBar.setGravity(Gravity.CENTER);
-        tabBar.setBackgroundColor(COL_FUNC);
+        tabBar.setBackgroundColor(0xFFE9EAEC);
         String[] names = {"中文", "数字", "符号", "表情", "剪贴板"};
         for (int i = 0; i < 5; i++) {
             final int m = TAB_MODES[i];
@@ -183,7 +183,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     private void updateTabHighlight() {
         for (int i = 0; i < 5; i++) {
             boolean sel = TAB_MODES[i] == panelMode;
-            tabs[i].setTextColor(sel ? COL_MAIN : COL_SUB);
+            tabs[i].setTextColor(sel ? COL_LINK : COL_SUB);
             tabs[i].setBackgroundColor(sel ? COL_KEYS : COL_FUNC);
             tabs[i].setTypeface(null, sel ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
         }
@@ -194,7 +194,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         toolbar = new LinearLayout(this);
         toolbar.setOrientation(LinearLayout.HORIZONTAL);
         toolbar.setGravity(Gravity.CENTER_VERTICAL);
-        toolbar.setBackgroundColor(COL_FUNC);
+        toolbar.setBackgroundColor(0xFFE9EAEC);
         toolbar.setPadding(0, 0, 0, 0);
         toolbar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(D_TOOLBAR)));
 
@@ -322,7 +322,7 @@ public class CloudWubiLiteIME extends InputMethodService {
                 del.setTextColor(COL_MAIN);
                 del.setTextSize(FS_PANEL);
                 del.setGravity(Gravity.CENTER);
-                del.setBackground(roundBg(COL_FUNC));
+                del.setBackground(keyBg(true));
                 del.setOnClickListener(v -> {
                     if (composing.length() > 0) {
                         composing.setLength(composing.length() - 1);
@@ -349,7 +349,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             sp1.setText("空格");
             sp1.setTextColor(COL_SUB); sp1.setTextSize(FS_PANEL);
             sp1.setGravity(Gravity.CENTER);
-            sp1.setBackground(roundBg(COL_KEYS));
+            sp1.setBackground(keyBg(false));
             sp1.setOnClickListener(v -> onSpace());
             LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(56), 2);
             slp1.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
@@ -365,7 +365,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             sp2.setText("空格");
             sp2.setTextColor(COL_SUB); sp2.setTextSize(FS_PANEL);
             sp2.setGravity(Gravity.CENTER);
-            sp2.setBackground(roundBg(COL_KEYS));
+            sp2.setBackground(keyBg(false));
             sp2.setOnClickListener(v -> onSpace());
             LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(56), 1);
             slp2.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
@@ -377,7 +377,7 @@ public class CloudWubiLiteIME extends InputMethodService {
 
     private View makeKey(final String letter, int h, int cols) {
         android.widget.FrameLayout k = new android.widget.FrameLayout(this);
-        k.setBackground(roundBg(COL_KEYS));
+        k.setBackground(keyBg(false));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, h, 1);
         lp.setMargins(dp(D_GAP), dp(D_GAP) / 2, dp(D_GAP), dp(D_GAP) / 2);
         k.setLayoutParams(lp);
@@ -400,6 +400,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         main.setText(letter.toUpperCase());
         main.setTextColor(COL_MAIN);
         main.setTextSize(FS_KEY);
+        main.setTypeface(null, android.graphics.Typeface.BOLD);
         main.setGravity(Gravity.CENTER);
         k.addView(main, new android.widget.FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -429,7 +430,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         b.setTextColor(COL_MAIN);
         b.setTextSize(FS_FUNC);
         b.setGravity(Gravity.CENTER);
-        b.setBackground(roundBg(COL_FUNC));
+        b.setBackground(keyBg(true));
         b.setOnClickListener(v -> funcAction(action));
         LinearLayout.LayoutParams lp = weight > 0 ? new LinearLayout.LayoutParams(0, h, weight)
                                                   : new LinearLayout.LayoutParams(w, h);
@@ -874,6 +875,15 @@ public class CloudWubiLiteIME extends InputMethodService {
         g.setColor(color);
         g.setCornerRadius(dp(D_RADIUS));
         g.setStroke(dp(1), 0xFFD8D8D8);
+        return g;
+    }
+    // 键面质感：上下渐变 + 底部深色描边（模拟投影，国际标准）
+    private android.graphics.drawable.Drawable keyBg(boolean func) {
+        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable(
+            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+            func ? new int[]{0xFFF0F1F3, 0xFFE3E5E8} : new int[]{0xFFFFFFFF, 0xFFF5F6F8});
+        g.setCornerRadius(dp(D_RADIUS));
+        g.setStroke(dp(1), func ? 0xFFC9CDD3 : 0xFFD9DCE0);
         return g;
     }
     private int dp(int v) { return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics())); }
