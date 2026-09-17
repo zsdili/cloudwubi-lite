@@ -40,6 +40,7 @@ import java.util.List;
  *           + 数字计算 + 符号 + 剪贴板 + APP 信息（版本/GitHub/微信）
  */
 public class CloudWubiLiteIME extends InputMethodService {
+    private android.os.Handler mHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
     // ---------- V12 设计令牌 ----------
     private static final int COL_KEYS = Color.WHITE;        // 键面白
@@ -681,14 +682,25 @@ public class CloudWubiLiteIME extends InputMethodService {
         if (code.isEmpty()) { updateCandBar(); return; }
         // 本地单字（1-4 码 + 万能键）
         List<String> locals = engine.queryWildcard(code);
-        // 4 码：本地内置词优先 → 云端词组 → 单字殿后
+        // 4 码：本地内置词立即显示 → 云端词组异步补入（不阻塞 UI、慢网不超时空）
         if (code.length() == 4) {
             java.util.List<String> localPh = phraseMap.get(code);
             if (localPh != null) for (String lp : localPh) if (!candidates.contains(lp)) candidates.add(lp);
-            List<String> cloud = CloudClient.queryPhrases(code);
-            // 词组按用户词频降序（上屏过的词组置前；稳定排序保持云端默认顺序）
-            cloud.sort((a, b) -> Integer.compare(engine.boostOf(b), engine.boostOf(a)));
-            for (String p : cloud) if (!candidates.contains(p)) candidates.add(p);
+            final String fcode = code;
+            new Thread(() -> {
+                List<String> cloud = CloudClient.queryPhrases(fcode);
+                mHandler.post(() -> {
+                    if (!fcode.equals(composing.toString())) return; // 编码已变则丢弃
+                    List<String> merged = new java.util.ArrayList<>(candidates);
+                    for (String p : cloud) {
+                        p = p.trim();
+                        if (p.length() >= 2 && !merged.contains(p)) merged.add(p);
+                    }
+                    candidates.clear();
+                    candidates.addAll(merged);
+                    updateCandBar();
+                });
+            }).start();
         }
         for (String s : locals) if (!candidates.contains(s)) candidates.add(s);
         updateCandBar();
