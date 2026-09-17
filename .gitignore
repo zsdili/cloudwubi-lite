@@ -1,0 +1,4 @@
+android/build-apk/
+android/build/
+*.apk
+__pycache__/

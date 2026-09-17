@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cloudwubi.lite"
+    android:versionCode="160"
+    android:versionName="0.6.0">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:label="云五笔"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@android:style/Theme.Light.NoTitleBar">
+        <service
+            android:name=".CloudWubiLiteIME"
+            android:label="云五笔"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
+    </application>
+</manifest>

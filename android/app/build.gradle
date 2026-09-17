@@ -1,0 +1,11 @@
+apply plugin: 'com.android.application'
+android {
+    compileSdkVersion 34
+    defaultConfig {
+        applicationId "com.cloudwubi.lite"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 160
+        versionName "0.6.0"
+    }
+}
