@@ -4,8 +4,8 @@ aaa工
 aaaa工
 aad式
 aadk匿
-aadn葚
 aadn慝
+aadn葚
 aadw萁
 aaf苷
 aafd甙
@@ -126,8 +126,8 @@ afbh邯
 afc靶
 afcn靶
 afcs鞣
-afcu芸
 afcu芰
+afcu芸
 afd甘
 afdj薷
 afdp鞑
@@ -494,8 +494,8 @@ aqvf萏
 aqw芡
 aqwu芡
 aqy芍
-aqyg鸢
 aqyg茑
+aqyg鸢
 aqyu芍
 ar匠
 arc葩
@@ -703,8 +703,8 @@ aynr芦
 ayp葶
 ayps葶
 ays蘑
-aysd蘼
 aysd蘑
+aysd蘼
 ayt蔟
 aytd蔟
 ayv莨
@@ -835,8 +835,8 @@ bmou粜
 bn也
 bnh了
 bnh凵
-bnh阝
 bnh卩
+bnh阝
 bnhg孑
 bnhn也
 bnn孔
@@ -956,8 +956,8 @@ cbtc骛
 cbtg鹜
 cbtg鹬
 cbth瞀
-cbtj蟊
 cbtj蝥
+cbtj蟊
 cbtn矜
 cbtq鍪
 cbtr矛
@@ -2678,8 +2678,8 @@ gqu殚
 gquf殚
 gqv兀
 gqw殓
-gqwe餮
 gqwe殄
+gqwe餮
 gqwi殓
 gqx死
 gqxb死
@@ -2958,8 +2958,8 @@ hwbf龌
 hwbg龃
 hwbh龊
 hwbj齿
-hwbk龉
 hwbk龆
+hwbk龉
 hwbn龅
 hwbx龀
 hwbx龇
@@ -3915,8 +3915,8 @@ jqwp遏
 jqww歇
 jr蝗
 jrg蝗
-jrgg蝗
 jrgg蚯
+jrgg蝗
 jrh昕
 jri蛛
 jriy蛛
@@ -4088,8 +4088,8 @@ kaqy呕
 kat哓
 katq哓
 kaw哄
-kawk嗬
 kawk嗒
+kawk嗬
 kawy哄
 kay嚆
 kayk嚆
@@ -4201,12 +4201,12 @@ kfpu噎
 kfq呒
 kfqn呒
 kft哮
-kftb嘟
 kftb哮
+kftb嘟
 kftj嗜
 kfw呋
-kfwy嚯
 kfwy呋
+kfwy嚯
 kg呈
 kgb吨
 kgbh郢
@@ -4645,8 +4645,8 @@ kwwf唑
 kwx哗
 kwxf哗
 kwy叭
-kwyc噙
 kwyc呤
+kwyc噙
 kwyg唯
 kwyn吟
 kwyo噍
@@ -4797,8 +4797,8 @@ lhj罩
 lhjj罩
 lhn皿
 lhng四
-lhng皿
 lhng囗
+lhng皿
 lhnh甲
 lhnt轳
 lj辊
@@ -4918,8 +4918,8 @@ lvy轫
 lvyy轫
 lw办
 lwe轸
-lwet轸
 lwet畛
+lwet轸
 lwg输
 lwgg辁
 lwgj输
@@ -5561,8 +5561,8 @@ ntdg恬
 nte必
 ntf尾
 ntfc屐
-ntfh忤
 ntfh忏
+ntfh忤
 ntfn尾
 ntg性
 ntgg性
@@ -6418,8 +6418,8 @@ qgj鲁
 qgjc鳗
 qgjf鲁
 qgjf鲤
-qgjf鲥
 qgjf鲣
+qgjf鲥
 qgjj鲳
 qgjn鳎
 qgjx鲲
@@ -6617,8 +6617,8 @@ qnk馈
 qnkm馈
 qnm饥
 qnmn饥
-qnn钇
 qnn钆
+qnn钇
 qnnk饲
 qnnk锔
 qnnr饧
@@ -6776,8 +6776,8 @@ qten锈
 qtf钎
 qtfc铥
 qtfe猿
-qtfh钎
 qtfh犴
+qtfh钎
 qtfj猪
 qtfk锆
 qtfp铤
@@ -6935,8 +6935,8 @@ qwx铧
 qwxf铧
 qwy锥
 qwyc铃
-qwye飧
 qwye镌
+qwye飧
 qwyg锥
 qwyn钤
 qx镪
@@ -7369,8 +7369,8 @@ rqay抵
 rqb抑
 rqbh抑
 rqc鬼
-rqcc魑
 rqcc魃
+rqcc魑
 rqce魈
 rqcf魁
 rqci鬼
@@ -7777,8 +7777,8 @@ sgmk酮
 sgmu醴
 sgmw柄
 sgn配
-sgne醪
 sgne醑
+sgne醪
 sgnn配
 sgnn朽
 sgo醚
@@ -8022,8 +8022,8 @@ std桥
 stdg栝
 stdj桥
 stf橇
-stfh桁
 stfh杵
+stfh桁
 stfk梏
 stfn橇
 stfp梃
@@ -8095,8 +8095,8 @@ swwy枞
 swx桦
 swxf桦
 swy椎
-swyc檎
 swyc柃
+swyc檎
 swyf榫
 swyg椎
 swyo樵
@@ -8471,8 +8471,8 @@ tlon粤
 tlp笾
 tlpu笾
 tlq箩
-tlqi囱
 tlqi囟
+tlqi囱
 tlqu箩
 tlu衅
 tluf衅
@@ -8831,8 +8831,8 @@ udn羞
 udnb羌
 udnf羞
 udng翔
-udnv疣
 udnv疠
+udnv疣
 udp送
 udpi送
 udpi闼
@@ -8894,8 +8894,8 @@ ufwt凌
 ufy装
 ufye装
 ug闰
-ugd闰
 ugd闩
+ugd闰
 ugdu美
 uge靖
 ugeg靖
@@ -9207,8 +9207,8 @@ uwee疹
 uwf瘵
 uwfi瘵
 uwg痊
-uwgd阕
 uwgd痊
+uwgd阕
 uwi闪
 uwj疥
 uwjk疥
@@ -9458,8 +9458,8 @@ vnud鼷
 vnuk鼯
 vnum鼬
 vnun鼠
-vnuv鼹
 vnuv鼢
+vnuv鼹
 vnx妮
 vnxn妮
 vny姒
@@ -10008,8 +10008,8 @@ wwb耸
 wwbf耸
 wwbn伧
 wwe佾
-wweg俎
 wweg佾
+wweg俎
 wwf坐
 wwfc侩
 wwff坐
@@ -10057,8 +10057,8 @@ wybc禽
 wyc令
 wycb邻
 wycm领
-wycn翎
 wycn瓴
+wycn翎
 wycu令
 wye依
 wyeb隽
@@ -10816,8 +10816,8 @@ yqnv庖
 yqt诳
 yqtg诳
 yqv谄
-yqvg谄
 yqvg诌
+yqvg谄
 yqvh诤
 yr诉
 yrg诟

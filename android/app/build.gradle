@@ -6,6 +6,6 @@ android {
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 161
-        versionName "0.6.1"
+        versionName "0.6.2"
     }
 }

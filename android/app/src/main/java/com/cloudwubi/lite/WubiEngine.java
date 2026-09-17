@@ -91,6 +91,9 @@ public class WubiEngine {
         }
     }
 
+    /** 取某字/词的用户词频（词组排序用） */
+    public int boostOf(String text) { return boost.getOrDefault(text, 0); }
+
     public boolean has(String code) { return map.containsKey(code); }
     public int size() { return map.size(); }
     public Map<String, ArrayList<String>> rawMap() { return map; }

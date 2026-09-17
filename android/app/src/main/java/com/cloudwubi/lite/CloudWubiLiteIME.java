@@ -539,6 +539,8 @@ public class CloudWubiLiteIME extends InputMethodService {
         // 4 码：云端词组优先（词组在前，单字殿后）
         if (code.length() == 4) {
             List<String> cloud = CloudClient.queryPhrases(code);
+            // 词组按用户词频降序（上屏过的词组置前；稳定排序保持云端默认顺序）
+            cloud.sort((a, b) -> Integer.compare(engine.boostOf(b), engine.boostOf(a)));
             for (String p : cloud) if (!candidates.contains(p)) candidates.add(p);
         }
         for (String s : locals) if (!candidates.contains(s)) candidates.add(s);
@@ -566,8 +568,8 @@ public class CloudWubiLiteIME extends InputMethodService {
             if (pendingCalcResult) { /* 计算上屏带公式走 deleteSurrounding 无 */ }
             ic.commitText(text, 1);
         }
-        if (chineseMode && text.length() == 1 && engine != null && isCjk(text)) {
-            engine.onCommit(text);
+        if (chineseMode && engine != null && isCjk(text)) {
+            engine.onCommit(text);   // 单字与词组均记词频/MRU（v0.6.2：词组上屏也前移）
             saveFreq();
         }
         CloudClient.report(text);
