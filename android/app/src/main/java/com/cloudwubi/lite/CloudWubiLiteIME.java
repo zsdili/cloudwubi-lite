@@ -53,7 +53,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int D_MARGIN = 14, D_GAP = 4, D_RADIUS = 7;
     // ---------- V12 字号令牌（统一规范） ----------
     private static final int FS_KEY = 20;    // 键盘字母/数字
-    private static final int FS_ROOT = 10;   // 上档数字/符号
+    private static final int FS_ROOT = 12;   // 上档数字/符号（加大清晰）
     private static final int FS_FUNC = 15;   // 功能键（shift/123/中英/回车）
     private static final int FS_CAND = 16;   // 备选栏（用户指定 16pt）
     private static final int FS_PANEL = 14;  // 其他界面（符号/剪贴板/信息/工具栏/状态栏——用户指定 14f）
