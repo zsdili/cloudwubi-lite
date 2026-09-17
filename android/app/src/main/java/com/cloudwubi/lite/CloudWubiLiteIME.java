@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 云五笔 Lite（v0.6.1）
+ * 云五笔 Lite（v0.6.5）
  * 设计基准：V12 设计稿（键面白 #FFF / 功能灰 #E8EAED / 选中蓝 #DCE1E7；
  *           文字主 #3A3F47 / 次 #9AA0A8；圆角 8 / 间隙 3 / 边距 12；总高 300）
  * 功能极简：王码86 单字（1/2/3/4 码 + 万能键 z）+ 云端词组（SCF）+ 词频/MRU 可调
@@ -47,8 +47,15 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int COL_SEL  = Color.rgb(0xDC, 0xE1, 0xE7); // 选中蓝
     private static final int COL_MAIN = Color.rgb(0x3A, 0x3F, 0x47); // 主文字
     private static final int COL_SUB  = Color.rgb(0x9A, 0xA0, 0xA8); // 次文字
+    private static final int COL_LINK = 0xFF3366CC;                 // 链接（GitHub 反馈）
     private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 239;
     private static final int D_MARGIN = 12, D_GAP = 3, D_RADIUS = 8;
+    // ---------- V12 字号令牌（统一规范） ----------
+    private static final int FS_KEY = 20;    // 键盘字母/数字
+    private static final int FS_ROOT = 9;    // 字根标注/数字子标
+    private static final int FS_FUNC = 15;   // 功能键（shift/123/中英/回车）
+    private static final int FS_CAND = 16;   // 备选栏（用户指定 16pt）
+    private static final int FS_PANEL = 14;  // 其他界面（符号/剪贴板/信息/工具栏/状态栏——用户指定 14f）
 
     // ---------- 王码86 字根标注（键面次文字） ----------
     private static final String[][] ROOTS = {
@@ -148,7 +155,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         statusInfo = new TextView(this);
         statusInfo.setText("云五笔");
         statusInfo.setTextColor(COL_MAIN);
-        statusInfo.setTextSize(13);
+        statusInfo.setTextSize(FS_PANEL);
         statusInfo.setGravity(Gravity.CENTER_VERTICAL);
         brandBox.addView(statusInfo);
         redDot = new View(this);
@@ -170,7 +177,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         TextView b = new TextView(this);
         b.setText(glyph);
         b.setTextColor(COL_MAIN);
-        b.setTextSize(15);
+        b.setTextSize(FS_PANEL);
         b.setGravity(Gravity.CENTER);
         b.setBackground(roundBg(COL_KEYS));
         int s = dp(24);
@@ -211,7 +218,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             TextView tv = new TextView(this);
             tv.setText(c);
             tv.setTextColor(COL_MAIN);
-            tv.setTextSize(16);
+            tv.setTextSize(FS_CAND);
             tv.setGravity(Gravity.CENTER);
             tv.setPadding(dp(6), 0, dp(6), 0);
             tv.setOnClickListener(v -> commit(c));
@@ -258,7 +265,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.addView(makeFuncKey(chineseMode ? "中" : "EN", "lang", dp(48), dp(74), 0));
         TextView sp = new TextView(this);
         sp.setText("空格");
-        sp.setTextColor(COL_SUB); sp.setTextSize(13);
+        sp.setTextColor(COL_SUB); sp.setTextSize(FS_PANEL);
         sp.setGravity(Gravity.CENTER);
         sp.setBackground(roundBg(COL_KEYS));
         sp.setOnClickListener(v -> onSpace());
@@ -281,7 +288,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         TextView main = new TextView(this);
         main.setText(shiftState && !chineseMode ? letter.toUpperCase() : letter);
         main.setTextColor(COL_MAIN);
-        main.setTextSize(20);
+        main.setTextSize(FS_KEY);
         main.setGravity(Gravity.CENTER);
         k.addView(main);
         // 字根标注（次文字）
@@ -290,7 +297,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             TextView sub = new TextView(this);
             sub.setText(root);
             sub.setTextColor(COL_SUB);
-            sub.setTextSize(9);
+            sub.setTextSize(FS_ROOT);
             sub.setGravity(Gravity.CENTER);
             k.addView(sub);
         }
@@ -300,7 +307,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             TextView dgt = new TextView(this);
             dgt.setText(String.valueOf(digit));
             dgt.setTextColor(COL_SUB);
-            dgt.setTextSize(9);
+            dgt.setTextSize(FS_ROOT);
             dgt.setGravity(Gravity.TOP | Gravity.LEFT);
             k.addView(dgt, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(12)));
         }
@@ -328,7 +335,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         TextView b = new TextView(this);
         b.setText(label);
         b.setTextColor(COL_MAIN);
-        b.setTextSize(15);
+        b.setTextSize(FS_FUNC);
         b.setGravity(Gravity.CENTER);
         b.setBackground(roundBg(COL_FUNC));
         b.setOnClickListener(v -> funcAction(action));
@@ -380,10 +387,10 @@ public class CloudWubiLiteIME extends InputMethodService {
             for (String k : row) {
                 TextView b = new TextView(this);
                 b.setText(k);
-                b.setTextColor(COL_MAIN); b.setTextSize(20);
+                b.setTextColor(COL_MAIN); b.setTextSize(FS_KEY);
                 b.setGravity(Gravity.CENTER);
                 b.setBackground(roundBg(COL_KEYS));
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(45), 1);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(40), 1);
                 lp.setMargins(dp(D_GAP), dp(D_GAP), dp(D_GAP), dp(D_GAP));
                 b.setLayoutParams(lp);
                 b.setOnClickListener(v -> onCalcKey(k));
@@ -431,11 +438,12 @@ public class CloudWubiLiteIME extends InputMethodService {
         for (String s : syms) {
             TextView b = new TextView(this);
             b.setText(s);
-            b.setTextColor(COL_MAIN); b.setTextSize(16);
+            b.setTextColor(COL_MAIN); b.setTextSize(FS_PANEL);
             b.setGravity(Gravity.CENTER);
             b.setBackground(roundBg(COL_KEYS));
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
-            lp.width = 0; lp.height = dp(42);
+            lp.width = 0; lp.height = dp(40);
+            lp.setMargins(dp(1), dp(1), dp(1), dp(1));
             lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f);
             b.setLayoutParams(lp);
             final String c = s;
@@ -466,7 +474,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             for (final String item : clips) {
                 TextView tv = new TextView(this);
                 tv.setText(item);
-                tv.setTextColor(COL_MAIN); tv.setTextSize(14);
+                tv.setTextColor(COL_MAIN); tv.setTextSize(FS_PANEL);
                 tv.setPadding(dp(4), dp(6), dp(4), dp(6));
                 tv.setGravity(Gravity.CENTER_VERTICAL);
                 tv.setBackground(roundBg(COL_KEYS));
@@ -492,21 +500,21 @@ public class CloudWubiLiteIME extends InputMethodService {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setGravity(Gravity.CENTER);
         String[] lines = {
-            "云五笔 v0.6.1",
+            "云五笔 v" + verName(),
             "GitHub 反馈：github.com/zsdili",
             "微信反馈：添加好友后留言",
             "空格=选首词 | 点选=上屏 | 上滑=数字",
             "剪贴板长按=删除 | 编码不足自动查词",
-            latestVersion != null && !latestVersion.equals("v0.6.1") ? "新版本：" + latestVersion : "已是最新版本"
+            latestVersion != null && !latestVersion.equals("v" + verName()) ? "新版本：" + latestVersion : "已是最新版本"
         };
         for (String s : lines) {
             TextView tv = new TextView(this);
             tv.setText(s);
-            tv.setTextColor(COL_MAIN); tv.setTextSize(14);
+            tv.setTextColor(COL_MAIN); tv.setTextSize(FS_PANEL);
             tv.setGravity(Gravity.CENTER);
             tv.setPadding(0, dp(6), 0, dp(6));
             box.addView(tv);
-            if (s.startsWith("GitHub")) tv.setTextColor(0xFF3366CC);
+            if (s.startsWith("GitHub")) tv.setTextColor(COL_LINK);
             if (s.startsWith("GitHub")) tv.setOnClickListener(v -> openUrl("https://github.com/zsdili"));
         }
         keyArea.addView(box, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -618,7 +626,7 @@ public class CloudWubiLiteIME extends InputMethodService {
         }
         statusInfo.setText(txt);
         if (redDot != null) {
-            boolean hasNew = latestVersion != null && !latestVersion.equals("v0.6.1");
+            boolean hasNew = latestVersion != null && !latestVersion.equals("v" + verName());
             redDot.setVisibility(hasNew ? View.VISIBLE : View.GONE);
         }
     }
@@ -686,6 +694,11 @@ public class CloudWubiLiteIME extends InputMethodService {
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT: return "没听到声音";
             default: return "语音失败，再试一次";
         }
+    }
+
+    private String verName() {
+        try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; }
+        catch (Exception e) { return "0.6.5"; }
     }
 
     @Override public void onDestroy() {

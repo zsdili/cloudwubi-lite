@@ -5,7 +5,7 @@ android {
         applicationId "com.cloudwubi.lite"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 164
-        versionName "0.6.4"
+        versionCode 165
+        versionName "0.6.5"
     }
 }
