@@ -393,7 +393,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             android.widget.FrameLayout.LayoutParams ulp = new android.widget.FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             ulp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            ulp.bottomMargin = h / 2 + dp(3);
+            ulp.bottomMargin = h / 2 + dp(3) + dp(9); // 上档再上移9px
             k.addView(up, ulp);
         }
         // 主字母：大写居中（国际标准，键面无中文）
