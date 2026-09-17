@@ -96,6 +96,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     private TextView[] tabs = new TextView[5];   // 中文/数字/符号/表情/剪贴板
     private LinearLayout toolbar;
     private TextView statusInfo;             // 左侧"云五笔"（编码/计算显示）
+    private java.util.Map<String, java.util.List<String>> phraseMap = new java.util.HashMap<>();
     private View redDot;                     // 版本红点
     private HorizontalScrollView candScroll;
     private LinearLayout candBar;
@@ -114,6 +115,18 @@ public class CloudWubiLiteIME extends InputMethodService {
             r.close();
             engine = new WubiEngine(sb.toString());
             engine.loadPersist(getSharedPreferences("cloudwubi_pref", MODE_PRIVATE).getString("freq", ""));
+            try {
+                InputStream ip = getAssets().open("wubi86_phrases_lite.txt");
+                BufferedReader pr = new BufferedReader(new InputStreamReader(ip, "UTF-8"));
+                String pl;
+                while ((pl = pr.readLine()) != null) {
+                    pl = pl.trim();
+                    int sp = pl.indexOf(' ');
+                    if (sp < 1 || pl.length() < sp + 2) continue;
+                    phraseMap.computeIfAbsent(pl.substring(0, sp), k -> new java.util.ArrayList<>()).add(pl.substring(sp + 1).trim());
+                }
+                pr.close();
+            } catch (Exception pe) { /* 词表缺失不影响启动 */ }
         } catch (Exception e) {
             engine = new WubiEngine("g一\nr的\nt和\n");
         }
@@ -329,9 +342,9 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.setOrientation(LinearLayout.HORIZONTAL);
         bl.setGravity(Gravity.CENTER);
         if (chineseMode) {
-            bl.addView(makeFuncKey("123", "num", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("中/英", "lang", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("！，", "sym1", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("123", "num", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("中/英", "lang", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("！，", "sym1", dp(38), dp(38), 0));
             TextView sp1 = new TextView(this);
             sp1.setText("空格");
             sp1.setTextColor(COL_SUB); sp1.setTextSize(FS_PANEL);
@@ -341,13 +354,13 @@ public class CloudWubiLiteIME extends InputMethodService {
             LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(56), 2);
             slp1.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp1, slp1);
-            bl.addView(makeFuncKey("🎤", "voice", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("？。", "sym2", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("↵", "enter", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("🎤", "voice", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("？。", "sym2", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(38), dp(38), 0));
         } else {
-            bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("123", "num", dp(40), dp(40), 0));
-            bl.addView(makeFuncKey("EN", "lang", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("123", "num", dp(38), dp(38), 0));
+            bl.addView(makeFuncKey("EN", "lang", dp(38), dp(38), 0));
             TextView sp2 = new TextView(this);
             sp2.setText("空格");
             sp2.setTextColor(COL_SUB); sp2.setTextSize(FS_PANEL);
@@ -357,7 +370,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(56), 1);
             slp2.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp2, slp2);
-            bl.addView(makeFuncKey("↵", "enter", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(38), dp(38), 0));
         }
         keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
     }
@@ -378,7 +391,8 @@ public class CloudWubiLiteIME extends InputMethodService {
             up.setGravity(Gravity.CENTER_HORIZONTAL);
             android.widget.FrameLayout.LayoutParams ulp = new android.widget.FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            ulp.gravity = Gravity.TOP;
+            ulp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            ulp.bottomMargin = h / 2 + dp(4);
             k.addView(up, ulp);
         }
         // 主字母：大写居中（国际标准，键面无中文）
@@ -480,9 +494,10 @@ public class CloudWubiLiteIME extends InputMethodService {
         // 底行：返回 | 清空 | 退格
         LinearLayout bl = new LinearLayout(this);
         bl.setOrientation(LinearLayout.HORIZONTAL);
-        bl.addView(makeFuncKey("返回", "back", dp(60), dp(55), 0));
-        bl.addView(makeFuncKey("清空", "clear", dp(60), dp(55), 0));
-        bl.addView(makeFuncKey("⌫", "del", 0, dp(55), 1));
+        bl.setGravity(Gravity.CENTER_VERTICAL);
+        bl.addView(makeFuncKey("返回", "back", dp(40), dp(40), 0));
+        bl.addView(makeFuncKey("清空", "clear", dp(40), dp(40), 0));
+        bl.addView(makeFuncKey("⌫", "del", 0, dp(40), 1));
         keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(55)));
     }
 
@@ -665,8 +680,10 @@ public class CloudWubiLiteIME extends InputMethodService {
         if (code.isEmpty()) { updateCandBar(); return; }
         // 本地单字（1-4 码 + 万能键）
         List<String> locals = engine.queryWildcard(code);
-        // 4 码：云端词组优先（词组在前，单字殿后）
+        // 4 码：本地内置词优先 → 云端词组 → 单字殿后
         if (code.length() == 4) {
+            java.util.List<String> localPh = phraseMap.get(code);
+            if (localPh != null) for (String lp : localPh) if (!candidates.contains(lp)) candidates.add(lp);
             List<String> cloud = CloudClient.queryPhrases(code);
             // 词组按用户词频降序（上屏过的词组置前；稳定排序保持云端默认顺序）
             cloud.sort((a, b) -> Integer.compare(engine.boostOf(b), engine.boostOf(a)));
