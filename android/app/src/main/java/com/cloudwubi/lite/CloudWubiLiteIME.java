@@ -48,7 +48,7 @@ public class CloudWubiLiteIME extends InputMethodService {
     private static final int COL_MAIN = Color.rgb(0x3A, 0x3F, 0x47); // 主文字
     private static final int COL_SUB  = Color.rgb(0x9A, 0xA0, 0xA8); // 次文字
     private static final int COL_LINK = 0xFF3366CC;                 // 链接（GitHub 反馈）
-    private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 239;
+    private static final int D_TOOLBAR = 32, D_DIVIDER = 1, D_CAND = 28, D_KEYBOARD = 200;
     private static final int D_MARGIN = 12, D_GAP = 3, D_RADIUS = 8;
     // ---------- V12 字号令牌（统一规范） ----------
     private static final int FS_KEY = 20;    // 键盘字母/数字
@@ -284,8 +284,8 @@ public class CloudWubiLiteIME extends InputMethodService {
 
     // ---------- 中文键盘 ----------
     private void buildChineseKey() {
-        // 3 行字母 + 1 行底行（239dp：3×53 + 底行 80）
-        int rowH = (dp(D_KEYBOARD) - dp(80) - dp(2) * D_GAP) / 3;
+        // 3 行字母 + 1 行底行（200dp：3×46 + 底行 56）
+        int rowH = (dp(D_KEYBOARD) - dp(56) - dp(2) * D_GAP) / 3;
         String[][] rows = {
             {"q","w","e","r","t","y","u","i","o","p"},
             {"a","s","d","f","g","h","j","k","l"},
@@ -297,7 +297,7 @@ public class CloudWubiLiteIME extends InputMethodService {
             rl.setGravity(Gravity.CENTER);
             // V12 Z 行 = ↑ + z x c v b n m + ⌫（左 Shift、右退格删除）
             if (row[0].equals("z")) {
-                rl.addView(makeFuncKey("↑", "shift", dp(40), rowH, 0));
+                rl.addView(makeFuncKey("↑", "shift", rowH, rowH, 0));
             }
             for (String k : row) {
                 View mk = makeKey(k, rowH, 0);
@@ -320,7 +320,7 @@ public class CloudWubiLiteIME extends InputMethodService {
                     }
                     refreshStatus();
                 });
-                rl.addView(del, new LinearLayout.LayoutParams(dp(40), rowH));
+                rl.addView(del, new LinearLayout.LayoutParams(rowH, rowH));
             }
             keyArea.addView(rl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, rowH));
         }
@@ -329,37 +329,37 @@ public class CloudWubiLiteIME extends InputMethodService {
         bl.setOrientation(LinearLayout.HORIZONTAL);
         bl.setGravity(Gravity.CENTER);
         if (chineseMode) {
-            bl.addView(makeFuncKey("123", "num", dp(38), dp(74), 0));
-            bl.addView(makeFuncKey("中/英", "lang", dp(38), dp(74), 0));
-            bl.addView(makeFuncKey("！，", "sym1", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("123", "num", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("中/英", "lang", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("！，", "sym1", dp(40), dp(40), 0));
             TextView sp1 = new TextView(this);
             sp1.setText("空格");
             sp1.setTextColor(COL_SUB); sp1.setTextSize(FS_PANEL);
             sp1.setGravity(Gravity.CENTER);
             sp1.setBackground(roundBg(COL_KEYS));
             sp1.setOnClickListener(v -> onSpace());
-            LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(74), 2);
+            LinearLayout.LayoutParams slp1 = new LinearLayout.LayoutParams(0, dp(56), 2);
             slp1.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp1, slp1);
-            bl.addView(makeFuncKey("🎤", "voice", dp(38), dp(74), 0));
-            bl.addView(makeFuncKey("？。", "sym2", dp(38), dp(74), 0));
-            bl.addView(makeFuncKey("↵", "enter", dp(38), dp(74), 0));
+            bl.addView(makeFuncKey("🎤", "voice", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("？。", "sym2", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(40), dp(40), 0));
         } else {
-            bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(48), dp(74), 0));
-            bl.addView(makeFuncKey("123", "num", dp(48), dp(74), 0));
-            bl.addView(makeFuncKey("EN", "lang", dp(48), dp(74), 0));
+            bl.addView(makeFuncKey(shiftState ? "A" : "a", "shift", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("123", "num", dp(40), dp(40), 0));
+            bl.addView(makeFuncKey("EN", "lang", dp(40), dp(40), 0));
             TextView sp2 = new TextView(this);
             sp2.setText("空格");
             sp2.setTextColor(COL_SUB); sp2.setTextSize(FS_PANEL);
             sp2.setGravity(Gravity.CENTER);
             sp2.setBackground(roundBg(COL_KEYS));
             sp2.setOnClickListener(v -> onSpace());
-            LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(74), 1);
+            LinearLayout.LayoutParams slp2 = new LinearLayout.LayoutParams(0, dp(56), 1);
             slp2.setMargins(dp(D_GAP), 0, dp(D_GAP), 0);
             bl.addView(sp2, slp2);
-            bl.addView(makeFuncKey("↵", "enter", dp(48), dp(74), 0));
+            bl.addView(makeFuncKey("↵", "enter", dp(40), dp(40), 0));
         }
-        keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(80)));
+        keyArea.addView(bl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
     }
 
     private View makeKey(final String letter, int h, int cols) {
